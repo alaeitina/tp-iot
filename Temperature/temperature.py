@@ -12,7 +12,7 @@ def get_temperature():
     temp_int = int(temp_bin, 2)                  # Convertion Binaire -> Décimale
     temp_degree = temp_int * 0.0625              # Mise à l'échelle de la température
     i2c.deinit()                                 # Etient le périphérique
-return temp_degree
+    return temp_degree
 
 temperature = get_temperature()
-print("Temperature en degre: ",temp_degree)
+print("Temperature en degre: ",temperature)
