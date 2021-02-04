@@ -22,11 +22,12 @@ def get_indices_of_neighbour(value, liste):
         if value >= item:
             return item_id, item_id + 1
 
+
 def interpolation(x, x1, x2, y1, y2):
     """
     Cette fonction renvoie la valeur associée à x grâce à l'interpolation linéaire entre les points (x1, y1) et (x2, y2)
     """
-    return y1 + ((x – x1) / (x2 – x1)) * (y2 – y1)
+    return y1 + ((x - x1) / (x2 - x1)) * (y2 - y1)
 
 
 def get_colonne(indinf, indsup, temperature):
@@ -34,8 +35,8 @@ def get_colonne(indinf, indsup, temperature):
     Cette fonction retourne la colonne issue de l'interpolation entre chaque valeur de tension pour les valeurs de températures associées
     """
     newcol = []
-    valinf = [values[k][indinf]] for k in range(len(values))
-    valsup = [values[k][indsup]] for k in range(len(values))
+    valinf = [values[k][indinf] for k in range(len(values))]
+    valsup = [values[k][indsup] for k in range(len(values))]
 
     for i in range(len(valinf)):
         newcol.append(interpolation(temperature, abscisses[indinf], abscisses[indsup], valinf[i], valsup[i]))
