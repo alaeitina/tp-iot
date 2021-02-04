@@ -1,4 +1,3 @@
-#from .temperature import get_temperature
 
 values = [
     [0.76, 0.73, 0.70, 0.67, 0.63, 0.60, 0.56],
