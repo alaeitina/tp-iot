@@ -51,7 +51,7 @@ def get_humidite(temperature, tension):
     """
 
     #Récupération des indices correspondant à l'intervalle (dans abscisses) dans lequel est contenu la température
-    indinftemp, indsuptemp = get_indices_of_neighbour(tension, newcol)
+    indinftemp, indsuptemp = get_indices_of_neighbour(temperature, abscisses)
 
     #Génération de la colonne des tensions correspondant à la température récupérée (via l'interpolation)
     newcol = get_colonne(indinftemp, indsuptemp, temperature)
@@ -60,7 +60,7 @@ def get_humidite(temperature, tension):
     indinftens, indsuptens = get_indices_of_neighbour(tension, newcol)
 
     #Renvoie la valeur du pourcentage de l'humidite issue de l'interpolation entre les valeur de tension
-    return interpolation(tension, newcol[indinf], newcol[indsup], ordonnees[indinf], ordonnees[indsup])
+    return interpolation(tension, newcol[indinftens], newcol[indsuptens], ordonnees[indinftens], ordonnees[indsuptens])
 
 
 temperature = 12 #get_temperature()

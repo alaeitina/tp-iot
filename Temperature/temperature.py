@@ -14,5 +14,6 @@ def get_temperature():
     i2c.deinit()                                 # Etient le périphérique
     return temp_degree
 
+
 temperature = get_temperature()
 print("Temperature en degre: ",temperature)
