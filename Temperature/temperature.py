@@ -1,6 +1,4 @@
 from machine import I2C
-import time
-
 
 def get_temperature():
     i2c = I2C(0, pins=('P9','P10'))              # Instancie la connexion
