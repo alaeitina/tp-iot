@@ -4,9 +4,36 @@ import time
 from network import WLAN
 import pycom
 import network
+from machine import I2C
+
 
 availablecolor = 0x001100
 connectioncolor = 0x110000
+
+def read_byte():
+    i2c = I2C(0, pins=('P22','P21'))
+    a16 = i2c.readfrom(16, 255)
+    return a16
+
+def read_msg():
+    a = read_byte()
+    astr = str(a)[2:-1]
+    liste = astr.split('\\r\\n$')[1:-1]
+    return liste
+
+def loop_read_trame_GPGGA():
+    while True:
+        msgs = read_msg()
+        gpgga = [msg for msg in msgs if 'GPGGA' in msg]
+        if gpgga:
+            paramsplit = gpgga[0].split(',')
+            params = {}
+            params['time'] = paramsplit[1][:2]+':'+paramsplit[1][2:4]+':'+paramsplit[1][4:6]
+            if paramsplit[2] != '':
+                params['latitude'] = float(paramsplit[2][:2])+float(paramsplit[2][2:])/60 * ((-1)*(paramsplit[3] == 'S'))
+                params['longitude'] = float(paramsplit[5][:2])+float(paramsplit[5][2:])/60 * ((-1)*(paramsplit[3] == 'W'))
+                params['altitude'] = float(paramsplit[9])
+            return params
 
 # Thread for handling a client
 def client_thread(clientsocket,n):
@@ -34,6 +61,10 @@ def client_thread(clientsocket,n):
         pycom.rgbled(0xFFFFFF)
         clientsocket.send(http + "<html><body><h1> You are connection "+ str(n) + "</h1><br> Your browser will send multiple requests <br> <a href='/hello'> hello!</a><br><a href='/color'>change led color!</a></body></html>")
     elif "GET /map" in str(r):
+        params = loop_read_trame_GPGGA()
+        if not(params.get('latitude')):
+            params['latitude'] = 43.2907194
+            params['longitude'] = 5.3620492
         clientsocket.send(http + """
         <!DOCTYPE html>
 <html>
@@ -57,8 +88,8 @@ def client_thread(clientsocket,n):
         <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
 	<script type="text/javascript">
             // On initialise la latitude et la longitude de Paris (centre de la carte)
-            var lat = 43.2907194;
-            var lon = 5.3620492;
+            var lat = """+str(params['latitude'])+""";
+            var lon = """+str(params['longitude'])+""";
             var macarte = null;
             // Fonction d'initialisation de la carte
             function initMap() {
