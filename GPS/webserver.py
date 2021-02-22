@@ -21,7 +21,7 @@ def read_msg():
     liste = astr.split('\\r\\n$')[1:-1]
     return liste
 
-def loop_read_trame_GPGGA():
+def loop_read_dec_trame_GPGGA():
     while True:
         msgs = read_msg()
         gpgga = [msg for msg in msgs if 'GPGGA' in msg]
