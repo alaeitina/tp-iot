@@ -19,6 +19,10 @@ def read_msg():
     return liste
 
 def loop_read_dec_trame_GPGGA():
+    """
+    Fonction qui va retourner les parametres d'heure, de latitude, de longitude pour chaque detection de trame GPGGA
+    Les parametres de latitude et de longitude sont ici en degrés décimaux
+    """
     while True:
         msgs = read_msg()
         gpgga = [msg for msg in msgs if 'GPGGA' in msg]
