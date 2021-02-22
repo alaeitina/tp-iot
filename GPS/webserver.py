@@ -7,9 +7,6 @@ import network
 from machine import I2C
 
 
-availablecolor = 0x001100
-connectioncolor = 0x110000
-
 def read_byte():
     i2c = I2C(0, pins=('P22','P21'))
     a16 = i2c.readfrom(16, 255)
@@ -36,7 +33,7 @@ def loop_read_trame_GPGGA():
             return params
 
 # Thread for handling a client
-def client_thread(clientsocket,n):
+def client_thread(clientsocket):
     # Receive maxium of 12 bytes from the client
     r = clientsocket.recv(4096)
 
@@ -53,18 +50,14 @@ def client_thread(clientsocket,n):
     if "GET / " in str(r):
         #this is a get response for the page   
         # Sends back some data
-        clientsocket.send(http + "<html><body><h1> You are connection "+ str(n) + "</h1><br> Your browser will send multiple requests <br> <a href='/hello'> hello!</a><br><a href='/color'>change led color!</a></body></html>")
-    elif "GET /hello "in str(r):
-        
-        clientsocket.send(http + "<html><body><h1> Hello to you too! </h1><br> <a href='/'> go back </a></body></html>")
-    elif "GET /color" in str(r):
-        pycom.rgbled(0xFFFFFF)
-        clientsocket.send(http + "<html><body><h1> You are connection "+ str(n) + "</h1><br> Your browser will send multiple requests <br> <a href='/hello'> hello!</a><br><a href='/color'>change led color!</a></body></html>")
+        clientsocket.send(http + "<html><body><h1> Coucou </h1><br> Clique sur le lien pour accéder à la carte <br><a href='/map'>Carte</a><br></body></html>")
+
     elif "GET /map" in str(r):
-        params = loop_read_trame_GPGGA()
-        if not(params.get('latitude')):
+        params = loop_read_trame_GPGGA() # Récupération des coordonnées GPS
+        if not(params.get('latitude')): # Si jamais la puce GPS ne renvoie rien, on renvoie les coordonnées gps du Fort Saint Nicolas
             params['latitude'] = 43.2907194
             params['longitude'] = 5.3620492
+        # Envoie de la page web contenant la carte
         clientsocket.send(http + """
         <!DOCTYPE html>
 <html>
@@ -113,31 +106,23 @@ def client_thread(clientsocket,n):
     </body>
 </html>""")
     # Close the socket and terminate the thread
-
     clientsocket.close()
-    pycom.rgbled(connectioncolor)
     time.sleep_ms(500)
-    pycom.rgbled(availablecolor)  
 
 time.sleep(1)
 
 # setup as a station
 wlan = network.WLAN(mode=network.WLAN.STA)
 wlan.connect('IloveIoT', auth=(network.WLAN.WPA2, 'PycharmCestMieux13!'))
-print("Connexion en cours", end="")
+print("Connecting", end="")
 while not wlan.isconnected():
     print(".", end="")
     time.sleep_ms(50)
 print()
-print("Connexion réussie")
-print(wlan.ifconfig())
 ip, *_ = wlan.ifconfig()
 print(ip)
 
 print("WiFi is up!")
-time.sleep(1)
-pycom.heartbeat(False)
-pycom.rgbled(availablecolor)
 
 # Set up server socket
 serversocket = usocket.socket(usocket.AF_INET, usocket.SOCK_STREAM)
@@ -146,13 +131,12 @@ serversocket.bind((ip, 80))
 
 # Accept maximum of 5 connections at the same time
 serversocket.listen(5)
+print("Webserver is up!")
 
 # Unique data to send back
-c = 1
 while True:
     # Accept the connection of the clients
     (clientsocket, address) = serversocket.accept()
     # Start a new thread to handle the client
-    _thread.start_new_thread(client_thread, (clientsocket, c))
-    c = c+1
+    _thread.start_new_thread(client_thread, (clientsocket,))
 serversocket.close()
