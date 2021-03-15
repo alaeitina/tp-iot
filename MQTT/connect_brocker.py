@@ -16,13 +16,7 @@ c.set_callback(sub_cb)
 c.connect()
 c.subscribe(b"#")
 while True:
-    if True:
-        # Blocking wait for message
-        c.wait_msg()
-    else:
-        # Non-blocking wait for message
-        c.check_msg()
-        time.sleep(1)
+    c.wait_msg()
 
 c.disconnect()
 
