@@ -200,5 +200,9 @@ class MQTTClient:
     # If not, returns immediately with None. Otherwise, does
     # the same processing as wait_msg.
     def check_msg(self):
-        self.sock.setblocking(False)
-        return self.wait_msg()
+        if self.sock:
+            self.sock.setblocking(False)
+            return self.wait_msg()
+        else:
+            print(None)
+            return
