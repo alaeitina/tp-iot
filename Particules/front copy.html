@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Particules</title>
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+	</head>
+	<body>
+		<div id="particules" style="height: 250px;"></div>
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+		<script type="text/javascript">
+
+			memory = [
+			]
+
+
+
+			var linechart = new Morris.Line({
+			  element: 'particules',
+			  data: memory,
+			  xkey: 'time',
+			  ykeys: ['value'],
+			  labels: ['Value']
+			});
+
+			$(document).ready(function(){
+			function update_graph(){
+				$.ajax({
+					url:'http://192.168.43.87/get_value',
+					method:'GET',
+					dataType:'text',
+					async: true,
+					success: function(data_txt){
+						data = JSON.parse(data_txt.replaceAll("'", '"'))
+						memory.push(data)
+						if (memory.length > 60) {
+							memory = memory.slice(1, memory.length)
+						}
+						linechart.setData(memory)
+					},
+				})
+				setTimeout(() => { update_graph() }, 1000); // MAJ en temps réel du graph
+			}
+			update_graph()
+
+			});
+
+		</script>
+		
+	</body>
+</html>
