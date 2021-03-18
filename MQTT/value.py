@@ -26,6 +26,13 @@ def which_value(val):
     where = math.floor(val/(4096/n))
     return where
 
+def which_color(val):
+    """
+    Fonction permettant d'associer la valeur renvoyée par le potentiomètre à une couleur
+    """
+    where = math.floor(val/(4096/n_colors))
+    return colors[where]
+
 
 adc = machine.ADC()             # Création de l'objet ADC
 apin = adc.channel(pin='P13', attn=machine.ADC.ATTN_11DB)
@@ -38,3 +45,4 @@ while True:
     a = str(which_value(val))
     client.publish(b"temp", bytes(a, 'utf-8'))
     client.disconnect()
+    time.sleep(3)

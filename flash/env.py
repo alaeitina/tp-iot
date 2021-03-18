@@ -1,0 +1,5 @@
+
+ADA_USER = ""
+ADA_PASSWORD = ""
+NET_SSID = ""
+NET_PASS = ""
