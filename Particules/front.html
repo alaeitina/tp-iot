@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Particules</title>
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+	</head>
+	<body>
+		<div id="particules" style="height: 250px;"></div>
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+		<script type="text/javascript">
+
+			memory = [
+			]
+
+			function sleep(ms) {
+				return new Promise(resolve => setTimeout(resolve, ms));
+			}
+
+			var linechart = new Morris.Line({
+			  element: 'particules',
+			  data: memory,
+			  xkey: 'time',
+			  ykeys: ['value'],
+			  labels: ['Value']
+			});
+
+
+			while(true){
+				$.ajax({
+					url:'/get_value',
+					method:'GET',
+					dataType:'json'
+					success: async function(data){
+						memory.push(data)
+						if (memory.length > 15) {
+							memory = memory.slice(1, memory.length)
+						}
+						linechart.setData(memory)
+						await sleep(5)
+					}
+				})
+			}
+
+			//L = [0, 2, 4, 5, 8, 3, 9, 0, 5, 3]
+			/*for(var i = 1; i < L.length; i++){
+				memory.push({time: i, value: L[i]})
+				linechart.setData(memory)
+
+			}*/
+
+
+		</script>
+		
+	</body>
+</html>
