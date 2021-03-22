@@ -4,6 +4,7 @@ Ce script permet de récupérer la valeur de la densité de poussière
 
 import machine
 import time
+import math
 
 from machine import Pin
 from machine import Timer
@@ -14,14 +15,15 @@ DENSITY_CHARACTERISTICS = {
 }
 
 
-def potentio_to_particule(val):
+def to_particule(val):
     """
     Fonction permettant de simuler le détecteur de particules
     """
     output_min_particule = 0.61
-    output_max_particule = 3.7
+    output_max_particule = 5
     output_max_potentio = 4096
     return val * (output_max_particule - output_min_particule) / output_max_potentio + output_min_particule
+
 
 
 def get_indices_of_neighbour(value, liste):
@@ -65,6 +67,8 @@ def get_density():
         tot += val
     
     voltage = tot/50
+    voltage = to_particule(voltage)
+
 
     #Récupération des indices correspondant à l'intervalle dans lequel est contenu la tension du capteur
     print("voltage ",voltage)
@@ -83,7 +87,7 @@ def get_potentio():
     adc = machine.ADC()             # Création de l'objet ADC
     apin = adc.channel(pin='P13', attn=machine.ADC.ATTN_11DB)
     val_potentio = apin()                      # Lecture de la valeur de tension du potentiomètre à changer plus tard par celle du filtre à particule
-    voltage = potentio_to_particule(val_potentio)
+    voltage = to_particule(val_potentio)
 
     #Récupération des indices correspondant à l'intervalle dans lequel est contenu la tension du capteur
     indinf, indsup = get_indices_of_neighbour(voltage, DENSITY_CHARACTERISTICS['voltage'])

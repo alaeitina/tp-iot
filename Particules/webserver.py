@@ -4,7 +4,7 @@ import time
 from network import WLAN
 import pycom
 import network
-from TP6 import get_density
+from TP6 import get_density, get_potentio
 
 # Thread for handling a client
 def client_thread(clientsocket):
@@ -65,7 +65,7 @@ def client_thread(clientsocket):
 					success: function(data_txt){
 						data = JSON.parse(data_txt.replaceAll("'", '"'))
 						memory.push(data)
-						if (memory.length > 60) {
+						if (memory.length > 180) {
 							memory = memory.slice(1, memory.length)
 						}
 						linechart.setData(memory)
@@ -83,7 +83,7 @@ def client_thread(clientsocket):
 </html>""")
 
     elif "GET /get_value" in str(r):
-        clientsocket.send("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nConnection:close \r\n\r\n" + str({"time": time.time(), "value": get_potentio()}))
+        clientsocket.send("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nConnection:close \r\n\r\n" + str({"time": time.time(), "value": get_density()}))
 
     elif "GET /test" in str(r):
         clientsocket.send(http + "<html><body><h1> Coucou </h1><br> Clique sur le lien pour accéder à la carte <br><a href='/map'>Carte</a><br></body></html>")
