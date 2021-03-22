@@ -83,7 +83,7 @@ def client_thread(clientsocket):
 </html>""")
 
     elif "GET /get_value" in str(r):
-        clientsocket.send("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nConnection:close \r\n\r\n" + str({"time": time.time(), "value": get_density()}))
+        clientsocket.send("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nConnection:close \r\n\r\n" + str({"time": time.time(), "value": get_potentio()}))
 
     elif "GET /test" in str(r):
         clientsocket.send(http + "<html><body><h1> Coucou </h1><br> Clique sur le lien pour accéder à la carte <br><a href='/map'>Carte</a><br></body></html>")

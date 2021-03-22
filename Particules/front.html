@@ -27,22 +27,43 @@
 			  labels: ['Value']
 			});
 
-
-			while(true){
+			$(document).ready(function(){
+				console.log("ccc")
 				$.ajax({
-					url:'/get_value',
+						url:'http://192.168.43.87/get_value',
+						method:'GET',
+						dataType:'json',
+						success: async function(data){
+							memory.push(data)
+							if (memory.length > 15) {
+								memory = memory.slice(1, memory.length)
+							}
+							linechart.setData(memory)
+							console.log(memory)
+							await sleep(120000)
+						},
+						error:function(){
+							console.log("vas te faire foutre")
+						}
+					})
+			})
+
+			/*while(true){
+				$.ajax({
+					url:'http://192.168.43.87/get_value',
 					method:'GET',
-					dataType:'json'
+					dataType:'json',
 					success: async function(data){
 						memory.push(data)
 						if (memory.length > 15) {
 							memory = memory.slice(1, memory.length)
 						}
 						linechart.setData(memory)
-						await sleep(5)
+						console.log(memory)
+						await sleep(120000)
 					}
 				})
-			}
+			}*/
 
 			//L = [0, 2, 4, 5, 8, 3, 9, 0, 5, 3]
 			/*for(var i = 1; i < L.length; i++){

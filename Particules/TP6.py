@@ -38,10 +38,31 @@ def interpolation(x, x1, x2, y1, y2):
 
 
 def get_density():
+    apin = Pin('P21', mode=Pin.OUT)
+
+    apin.value(0)
+    time.sleep_us(320)
+    apin.value(1)
+    time.sleep_us(10000-320)
+
+    apin21 = Pin('P21', mode=Pin.OUT)
     adc = machine.ADC()             # Création de l'objet ADC
-    apin = adc.channel(pin='P13', attn=machine.ADC.ATTN_11DB)
-    val_potentio = apin()                      # Lecture de la valeur de tension du potentiomètre à changer plus tard par celle du filtre à particule
-    voltage = potentio_to_particule(val_potentio)
+    apin20 = adc.channel(pin='P20', attn=machine.ADC.ATTN_11DB)
+    chrono = Timer.Chrono()
+    tot = 0
+    for _ in range(50):
+        apin.value(0)
+        time.sleep_us(280)
+        chrono.start() #demarrage du chrono 
+        val = apin20()
+        apin.value(1)
+        time.sleep_us(10000-320-int(chrono.read_us())) #deduction du temps de recupération de la valeur
+        chrono.stop() #arret du chrono
+        chrono.reset() #reinitialisation du chrono
+        tot += val
+    
+    voltage = tot/50
+
 
     #Récupération des indices correspondant à l'intervalle dans lequel est contenu la tension du capteur
     indinf, indsup = get_indices_of_neighbour(voltage, DENSITY_CHARACTERISTICS['voltage'])
@@ -53,4 +74,26 @@ def get_density():
     density_str = "{:10.2f}".format(density * 100) + "%"
     print(density_str)
     return density * 100
-    
+
+
+import pycom
+import math
+from machine import Pin
+from machine import Timer
+
+
+
+apin21 = Pin('P21', mode=Pin.OUT)
+adc = machine.ADC()             # Création de l'objet ADC
+apin20 = adc.channel(pin='P20', attn=machine.ADC.ATTN_11DB)
+chrono = Timer.Chrono()
+while True:
+    apin21.value(0)
+    time.sleep_us(280)
+    chrono.starts() #demarrage du chrono 
+    val = apin20()
+    apin21.value(1)
+    time.sleep_us(10000-320-int(chrono.read_us())) #deduction du temps de recupération de la valeur
+    chrono.stop() #arret du chrono
+    chrono.reset() #reinitialisation du chrono
+    print(val)
